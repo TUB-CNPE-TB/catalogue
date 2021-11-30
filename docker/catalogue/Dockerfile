@@ -1,11 +1,12 @@
-FROM golang:1.7
+FROM golang:1.7 as stage
 
 COPY . /go/src/github.com/microservices-demo/catalogue
 WORKDIR /go/src/github.com/microservices-demo/catalogue
 
-RUN go get -u github.com/FiloSottile/gvt
-RUN gvt restore && \
-    CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /app github.com/microservices-demo/catalogue/cmd/cataloguesvc
+RUN GO111MODULE=on go mod init cmd/cataloguesvc/main.go
+RUN GO111MODULE=on go mod vendor
+RUN GO111MODULE=on go mod tidy
+RUN go build -o /app cmd/cataloguesvc/main.go
 
 FROM alpine:3.4
 
@@ -18,7 +19,7 @@ RUN	addgroup -g ${SERVICE_GID} ${SERVICE_GROUP} && \
 	adduser -g "${SERVICE_NAME} user" -D -H -G ${SERVICE_GROUP} -s /sbin/nologin -u ${SERVICE_UID} ${SERVICE_USER}
 
 WORKDIR /
-COPY --from=0 /app /app
+COPY --from=stage /app /app
 COPY images/ /images/
 
 RUN	chmod +x /app && \
