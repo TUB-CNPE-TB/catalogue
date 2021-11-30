@@ -1,14 +1,14 @@
-FROM golang:1.7 as stage
+FROM golang:1.17-alpine as stage
 
 COPY . /go/src/github.com/microservices-demo/catalogue
 WORKDIR /go/src/github.com/microservices-demo/catalogue
 
 RUN GO111MODULE=on go mod init cmd/cataloguesvc/main.go
 RUN GO111MODULE=on go mod vendor
-RUN GO111MODULE=on go mod tidy
+#RUN GO111MODULE=on go mod tidy
 RUN go build -o /app cmd/cataloguesvc/main.go
 
-FROM alpine:3.4
+FROM golang:1.17-alpine
 
 ENV	SERVICE_USER=myuser \
 	SERVICE_UID=10001 \
