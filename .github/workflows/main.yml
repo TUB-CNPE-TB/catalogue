@@ -32,11 +32,6 @@ jobs:
           fetch-depth: 1
           path: go/src/github.com/TUB-CNPE-TB/catalogue
 
-      - name: Submit Coveralls
-        env:
-          COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: goveralls -coverprofile=coverage.out -service=github
-
       - name: Build catalogue image
         uses: docker/build-push-action@v1
         if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/master'
